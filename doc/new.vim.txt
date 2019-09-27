@@ -1,0 +1,212 @@
+*new.vim.txt*
+                                                                      *new*
+
+==============================================================================
+CONTENTS                                                    *new-contents*
+  1. Commands...............................................|new-commands|
+  2. Configuration.....................................|new-configuration|
+  3. Functions.............................................|new-functions|
+  3. Examples...............................................|new-examples|
+==============================================================================
+COMMANDS                                                    *new-commands*
+
+:NewOpen {names}
+  Opens the layout(s) specified by {name}
+
+:NewClose {names}
+  Closes the layout(s) specified by {name}
+
+:NewToggle {names}
+  Toggles the layout(s) specified by {name}
+
+:NewRefresh
+  Repopulates all layouts. Can be used to reformat all open layouts back to
+  their original state.
+
+:NewReinit
+  After manual changes to g:new#layouts, call to re-normalize the dictionary.
+
+:NewCloseAll
+  Close all active layouts.
+==============================================================================
+CONFIGURATION                                          *new-configuration*
+
+g:new#eager_render[default=v:false]                       *g:new#eager_render*
+  If true, redraw after layout opening. May increase the smoothness of
+  layout population.
+
+g:new#pop_order                                              *g:new#pop_order*
+  Population order. Controls how new populates layouts.
+  Values:
+    'both'[default] -> Layouts will be realized in a single group of
+      traversals. This option should give the best performance.
+    'vert' -> Layouts will be realized in two groups of traversals. First
+      vertical splits will be populated, then horizontal splits.
+    'horz' -> Layouts will be realized in two groups of traversals. First
+      horizontal splits will be populated, then vertical splits.
+
+  g:new#pop_order = 'vert' >
+    ____________________
+    |     |            |
+    |     |            |
+    |win 3|            |
+    |     |            |
+    |     |            |
+    |     |            |
+    |------------------|
+    |  win 1  | win 2  |
+    |_________|________|
+<
+  g:new#pop_order = 'horz' >
+    ____________________
+    |     |            |
+    |     |            |
+    |win 3|            |
+    |     |            |
+    |     |            |
+    |     |            |
+    |     |------------|
+    |     |win 1 |win 2|
+    |_____|______|_____|
+
+g:new#layouts                                                  *g:new#layouts*
+  A list containing layouts accessible to this plugin. See |new-layouts| and
+  |new-layouts-example|.
+  NOTE: Windows are created from layouts using a depth first traversal of
+  the layout definition. The order of depths traversed is as follows:
+  left -> right -> top -> bot.
+  NOTE: Each model attribute will accept a funcref in addition to it's type.
+  If a funcref is passed the value will be computed lazily.
+                                                            *new-layouts-root*
+  Each layout consists of a root model and 1 or more child models, where each
+  model is a dictionary. A root model contains the following attributes:
+
+  {name}: The name of a layout definition. Used in `:NewOpen` and `:NewClose`
+
+  {left}[opt]: Layouts originating from the left, relative or absolute.
+
+  {right}[opt]: Layouts originating from the right, relative or absolute.
+
+  {top}[opt]: Layouts originating from the top, relative or absolute.
+
+  {bot}[opt]: Layouts originating from the bot, relative or absolute.
+
+  {opnBfr}[opt]: A list of commands to be executed before opening a
+  given layout.
+
+  {openAftr}[opt]: A list of commands to be executed before opening
+  a given layout.
+
+  {clsBfr}[opt]: A list of commands to be executed before closing a
+  given layout.
+
+  {clsAftr}[opt]: A list of commands to be executed before closing
+  given layout.
+
+  {init}[opt]: A list of commands to run on buffer creation. Accepts Strings
+  and funcrefs.
+
+  {restore}[opt] A list of commands to run on buffer restoration. Accepts
+  Strings and funcrefs.
+
+  {focus}[default=0]: If true, this model's window will be focused at the end
+  of layout realization.
+
+  {set_all}[default=['bh=hide', 'nobl']]: A list of bufferlocal settings to
+  apply to this model and all of its child models.
+
+  {set}[default=['bh=hide', 'nobl']]: A list of bufferlocal settings to
+  apply. For more info see |hidden-options|
+
+                                                           *new-layouts-child*
+
+  Each child model consists of itself and 0 more child models. A child model
+  contains the following attributes.
+
+  {init}[opt]: A list of commands to run on buffer creation. Accepts Strings
+  and funcrefs.
+
+  {restore}[opt]: A list of commands to run on buffer restoration. Accepts
+  Strings and funcrefs.
+
+  {v_sz}[opt]: Sets the width of the model window (same as vert resize).
+
+  {h_sz}[opt]: Sets the height of the model window (same as resize).
+
+  {abs}[default=true if direct descendent of root otherwise false]. If true
+  , the window represented by this model will be place absolutely as opposed
+  to relatively in the direction of it's orientation.
+
+  {left}[opt]: Layout left relative of this layout.
+
+  {right}[opt]: Layout right relative of this layout.
+
+  {top}[opt]: Layout top relative of this layout.
+
+  {bot}[opt]: Layout bot relative of this layout.
+
+  {focus}[default=0]: If true, this model's window will be focused at the end
+  of layout realization.
+
+  {set}[default=['bh=hide', 'nobl']]: A list of bufferlocal settings to
+  apply.
+                                                           *new-layouts-float*
+  Floating windows require a supporting version of neovim. Verify that
+  `echo exists('*nvim_open_win')` is true. Each attribute may be lazily
+  defined via funcref. Each floating layout contains the following
+  attributes:
+  NOTE: The values here are a simple wrapper around the parameters of
+  |nvim_open_win()| .
+
+  {x}[req]: The x coordinate to place the window corner defined by anchor.
+
+  {y}[req]: The y coordinate to place the window corner defined by anchor.
+
+  {width}[req]: The width of the floating window.
+
+  {height}[req]: The height of the floating window.
+
+  {relative}[default=editor]: Use the coordinate space of the editor or the
+  current window. The other possible value is `win`.
+
+  {focusable}[default=1]: If true, the floating window is focusable.
+
+  {focus}[default=0]: If true, the floating window will be focused.
+
+  {anchor}[default=NW]: The corner to place at coordinates (x, y). Other
+  values include `NE`, `SW`, `SE`.
+
+  {set}[default=['bh=hide', 'nobl']]: A list of bufferlocal settings to
+  apply. For more info see |hidden-options| .
+
+==============================================================================
+FUNCTIONS                                                  *new-functions*
+
+new#open(...)
+  Opens the layouts passed by name or by dictionary.
+
+new#close(...)
+  Closes the layouts passed by name or by dictionary.
+
+new#toggle(...)
+  Toggles the layouts passed by name or by dictionary.
+
+new#resize(...)
+  Resizes a root model(s) and all of its children to their defined size.
+  To resize all models when closing a window try >
+    au! BufDelete * call new#resize(new#util#active())
+
+new#refresh()
+  Toggles all active layouts twice.
+
+new#util#active()
+  Lists all active layout models
+
+new#util#traverse(target, bfr, aftr, horz, vert, node_type, cache)
+  For developers. The heart of new.vim. This function is a depth-first
+  traverse and do. It allows a series of actions to be performed
+  recursively over a model and its children. See source code for thorough
+  documentation.
+==============================================================================
+EXAMPLES                                                    *new-examples*
+see https://github.com/huawenyu/new/example
