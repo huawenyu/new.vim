@@ -263,7 +263,7 @@ function! new#util#get_visual_selection()
     let [lnum2, col2] = getpos("'>")[1:2]
     if lnum1 == lnum2
         let curline = getline('.')
-        return curline[col1-1:col2+1]
+        return curline[col1-1:col2-1]
     else
         let lines = getline(lnum1, lnum2)
         let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
