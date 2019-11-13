@@ -83,8 +83,8 @@ function s:State.stateHandler(...) abort
             silent! call s:log.info("State '", handler.ctrlName, '.', handler.stateName, "' action function '", handler.action, "' not exist")
         endif
     catch /.*/
-        silent! call s:log.debug(l:__func__, model.name, ".", handler.action, "() Caught error: " . v:exception)
-        echomsg ''. model.name, ".". handler.action. "() Caught error: " . v:exception)
+        silent! call s:log.debug(l:__func__, "When call ", model.name, ".", handler.action, "() Caught error: " . v:exception)
+        echomsg 'When call '. model.name, ".". handler.action. "() Caught error: " . v:exception)
     finally
         if !empty(handler.next)
             silent! call s:log.info("State '", handler.ctrlName, '.', handler.stateName, "' switchto [", handler.next, "]")
