@@ -25,7 +25,7 @@ endfunc
 
 
 function! new#state#CreateControl(ctrlName) abort
-    let l:__func__ = substitute(expand('<sfile>'), '.*\(\.\.\|\s\)', '', '')
+    let l:__func__ = 'new#state#CreateControl() '
 
     if !has_key(g:new#control, a:ctrlName)
         throw printf("%s() controller '%s' not exist.", l:__func__, a:ctrlName)

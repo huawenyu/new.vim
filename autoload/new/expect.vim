@@ -197,6 +197,8 @@ endfunction
 " Try to match a list of lines with the current state and call the handler if
 " the match succeeds. Return the index in `lines` of the first match.
 function s:Parser.parse(lines)
+    let __func__ = "s:Parser.parse() "
+
     let lines = a:lines
     if empty(lines)
         return -1
@@ -211,8 +213,8 @@ function s:Parser.parse(lines)
 
         let match_idx = match(lines, pattern)
 
-        "silent! call s:log.debug("s:Parser.parse() pattern=", pattern, " matches=", matches, " lines=", lines, " self=", self)
-        silent! call s:log.debug("s:Parser.parse() pattern=", pattern, " matches=", matches, " lines=", lines)
+        "silent! call s:log.debug(__func__, "pattern=", pattern, " matches=", matches, " lines=", lines, " handlerName=", state_handler_name," state=", state)
+        silent! call s:log.debug(__func__, "pattern=", pattern, " matches=", matches, " lines=", lines)
 
         call insert(matches, orig_handler_obj)
         call call(state[state_handler_name], matches, self._target)
