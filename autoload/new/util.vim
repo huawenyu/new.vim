@@ -195,6 +195,7 @@ fun! s:SID()
     return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
 endfun
 
+
 fun! new#util#send(viewname, cmdstr)
     let l:__func__ = "new#util#send() "
     "silent! call s:log.debug(l:__func__, " viewname=", a:viewname, " cmdstr=", a:cmdstr)
@@ -209,6 +210,7 @@ fun! new#util#send(viewname, cmdstr)
         call jobsend(l:model._job_id, a:cmdstr)
     endif
 endfun
+
 
 fun! new#util#post(viewname, cmdstr)
     let l:__func__ = "new#util#post() "
